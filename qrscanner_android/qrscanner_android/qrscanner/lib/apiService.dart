@@ -40,5 +40,6 @@ class Apiservice {
     } catch (e) {
       printToConsole(e.toString());
     }
+    return null;
   }
 }
