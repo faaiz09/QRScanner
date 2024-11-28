@@ -1,162 +1,203 @@
-// ignore_for_file: file_names, use_key_in_widget_constructors, library_private_types_in_public_api, prefer_const_constructors, avoid_print, prefer_const_literals_to_create_immutables, use_super_parameters
-
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
+// import 'package:lottie/lottie.dart';
 
-import 'LandingPage.dart';
-
-class LoginScreen extends StatefulWidget {
-  //all keys must be addressed to super in some sort of way , either this or just {super.key}
-  const LoginScreen({Key? key}) : super(key: key);
-  @override
-  _LoginScreenState createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen> {
-  //instead of use state , use stateful widget to kind of track the state
-  bool isDark = false;
-
-  TextEditingController usernameController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  // theme switcher
-  void _toggleTheme() {
-    setState(() {
-      isDark = !isDark;
-    });
-  }
-
-  // Login
-  void _handleLogin() {
-    if (usernameController.text.isEmpty || passwordController.text.isEmpty) {
-      // Alerts are called diaglogs here
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text("Invalid Credentials"),
-            content: Text("Please Input both your username and password"),
-            actions: <Widget>[
-              TextButton(
-                child: Text("Ok"),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    } else {
-      // instead of navigation.navigate or windows.navigate , its navigator.pushreplacement here to call the page from somewhere else
-      // each page must have a constructor within it or else it wont work
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const LandingPage()),
-      );
-    }
-  }
+class LoginScreen extends HookWidget {
+  const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final usernameController = useTextEditingController();
+    final passwordController = useTextEditingController();
+    final isLoading = useState(false);
+    final isObscured = useState(true);
+
+    Future<void> handleLogin() async {
+      if (usernameController.text.isEmpty || passwordController.text.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            behavior: SnackBarBehavior.floating,
+            margin: EdgeInsets.all(20.w),
+            content: const Text('Please fill in all fields'),
+            backgroundColor: Colors.red,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        );
+        return;
+      }
+
+      isLoading.value = true;
+
+      // Simulate API call
+      await Future.delayed(const Duration(seconds: 2));
+
+      isLoading.value = false;
+
+      if (context.mounted) {
+        Navigator.pushReplacementNamed(context, '/landing');
+      }
+    }
+
     return Scaffold(
-      backgroundColor: isDark ? Colors.black : Colors.white,
-      body: SafeArea(
-        child: Column(
-          children: <Widget>[
-            //Title red block
-            Container(
-              padding: const EdgeInsets.only(top: 0),
-              margin: const EdgeInsets.only(top: 0),
-              height: MediaQuery.of(context).size.height * 0.5,
-              width: MediaQuery.of(context).size.width * 1,
-              decoration: BoxDecoration(
-                color: Colors.red.shade900,
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(30),
-                  bottomRight: Radius.circular(30),
+      body: SingleChildScrollView(
+        child: SizedBox(
+          height: 1.sh,
+          child: Stack(
+            children: [
+              // Background gradient
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Theme.of(context).colorScheme.primary,
+                      Theme.of(context).colorScheme.primary.withOpacity(0.8),
+                    ],
+                  ),
                 ),
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.asset('/images/logo.png'),
-                  Text(
-                    'Login',
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // the main body
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                children: <Widget>[
-                  TextField(
-                    controller: usernameController,
-                    decoration: InputDecoration(
-                      labelText: 'Username',
-                      filled: true,
-                      fillColor: isDark ? Colors.grey[800] : Colors.grey[200],
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  TextField(
-                    controller: passwordController,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      labelText: 'Password',
-                      filled: true,
-                      fillColor: isDark ? Colors.grey[800] : Colors.grey[200],
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  GestureDetector(
-                    onTap: _handleLogin,
-                    child: Container(
-                      width: double.infinity,
-                      padding: EdgeInsets.symmetric(vertical: 16),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      child: Text(
-                        'Login',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+
+              // Content
+              SafeArea(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 24.w),
+                  child: Column(
+                    children: [
+                      SizedBox(height: 50.h),
+
+                      // Logo and welcome text
+                      Column(
+                        children: [
+                          Image.asset(
+                            'assets/images/Technocrafts-logo.png',
+                            // height: 200.h,
+                            // width: 200.h,
+                            fit: BoxFit.contain,
+                          )
+                              .animate()
+                              .fade(duration: const Duration(milliseconds: 500))
+                              .scale(
+                                  duration: const Duration(milliseconds: 500)),
+                          SizedBox(height: 20.h),
+                          Text(
+                            'Welcome Back!',
+                            style: GoogleFonts.poppins(
+                              fontSize: 28.sp,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          SizedBox(height: 8.h),
+                          Text(
+                            'Sign in to continue',
+                            style: GoogleFonts.poppins(
+                              fontSize: 16.sp,
+                              color: Colors.white70,
+                            ),
+                          ),
+                        ],
+                      ).animate().fadeIn().slideY(
+                            begin: -0.3,
+                            curve: Curves.easeOut,
+                          ),
+
+                      SizedBox(height: 40.h),
+
+                      // Login form
+                      Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        elevation: 8,
+                        child: Padding(
+                          padding: EdgeInsets.all(20.w),
+                          child: Column(
+                            children: [
+                              // Username field
+                              TextFormField(
+                                controller: usernameController,
+                                decoration: InputDecoration(
+                                  labelText: 'Username',
+                                  prefixIcon: const Icon(Icons.person_outline),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                              ).animate().fadeIn().slideX(
+                                    begin: -0.2,
+                                    delay: 200.ms,
+                                  ),
+
+                              SizedBox(height: 16.h),
+
+                              // Password field
+                              TextFormField(
+                                controller: passwordController,
+                                obscureText: isObscured.value,
+                                decoration: InputDecoration(
+                                  labelText: 'Password',
+                                  prefixIcon: const Icon(Icons.lock_outline),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      isObscured.value
+                                          ? Icons.visibility_outlined
+                                          : Icons.visibility_off_outlined,
+                                    ),
+                                    onPressed: () =>
+                                        isObscured.value = !isObscured.value,
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                              ).animate().fadeIn().slideX(
+                                    begin: 0.2,
+                                    delay: 400.ms,
+                                  ),
+
+                              SizedBox(height: 24.h),
+
+                              // Login button
+                              SizedBox(
+                                width: double.infinity,
+                                height: 56.h,
+                                child: ElevatedButton(
+                                  onPressed:
+                                      isLoading.value ? null : handleLogin,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        Theme.of(context).colorScheme.primary,
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  child: isLoading.value
+                                      ? const CircularProgressIndicator(
+                                          color: Colors.white,
+                                        )
+                                      : const Text('Login'),
+                                ),
+                              ).animate().fadeIn().slideY(
+                                    begin: 0.2,
+                                    delay: 600.ms,
+                                  ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
-                  SizedBox(height: 20),
-                  GestureDetector(
-                    onTap: _toggleTheme,
-                    child: Container(
-                      alignment: Alignment.centerRight,
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      child: Icon(
-                        isDark ? Icons.wb_sunny : Icons.nightlight_round,
-                        color: isDark ? Colors.white : Colors.black,
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

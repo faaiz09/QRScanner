@@ -1,249 +1,326 @@
-// ignore_for_file: library_private_types_in_public_api
-
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class AccessPermissionsPage extends StatefulWidget {
+class AccessPermissionsPage extends HookWidget {
   const AccessPermissionsPage({super.key});
 
   @override
-  _AccessPermissionsPageState createState() => _AccessPermissionsPageState();
-}
-
-class _AccessPermissionsPageState extends State<AccessPermissionsPage> {
-  bool isChecked = false;
-  bool isChecked1 = false;
-  bool isChecked2 = false;
-  bool isChecked3 = false;
-  bool isChecked4 = false;
-  bool isChecked5 = false;
-
-  String selected = ""; // Declare outside of build() to maintain state
-
-  List restrictionItems = [
-    {"id": 0, "value": false, "text": "Edit User Email & Phone"},
-    {"id": 1, "value": false, "text": "Support Access"},
-    {"id": 2, "value": false, "text": "Export User"},
-    {"id": 3, "value": false, "text": "Dashboard"},
-    {"id": 4, "value": false, "text": "Organization Switch"},
-    {"id": 5, "value": false, "text": "Reports"}
-  ];
-
-  List applicableOnItems = [
-    {"id": 0, "value": false, "text": "Non-admin users"},
-    {"id": 1, "value": false, "text": "Admin users"}
-  ];
-
-  @override
   Widget build(BuildContext context) {
+    final formKey = useMemoized(() => GlobalKey<FormState>());
+    final nameController = useTextEditingController();
+    final descriptionController = useTextEditingController();
+    final isLoading = useState(false);
+    final selectedRole = useState('Administrator');
+    final permissions = useState<Map<String, bool>>({
+      'View Content': true,
+      'Edit Content': false,
+      'Delete Content': false,
+      'Manage Users': false,
+      'Access Settings': false,
+    });
+    final additionalSettings = useState<Map<String, bool>>({
+      'Two-Factor Authentication': true,
+      'API Access': false,
+      'Email Notifications': true,
+      'Audit Logging': false,
+    });
+
+    Future<void> handleSave() async {
+      if (formKey.currentState?.validate() ?? false) {
+        isLoading.value = true;
+        try {
+          // Simulate API call
+          await Future.delayed(const Duration(seconds: 2));
+          // Show success message
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text('Permissions saved successfully'),
+                backgroundColor: Colors.green,
+                behavior: SnackBarBehavior.floating,
+                margin: EdgeInsets.all(20.w),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            );
+            Navigator.pop(context);
+          }
+        } catch (e) {
+          // Show error message
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text('Failed to save permissions'),
+                backgroundColor: Colors.red,
+                behavior: SnackBarBehavior.floating,
+                margin: EdgeInsets.all(20.w),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            );
+          }
+        } finally {
+          isLoading.value = false;
+        }
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.red, // Red background for the AppBar
-        title: const Text(
-          "Users & Permission",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        title: Text(
+          'User Permissions',
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.bold,
+          ),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () => Navigator.pushNamedAndRemoveUntil(
-                context, '/landing', (route) => false),
+          TextButton.icon(
+            onPressed: isLoading.value ? null : handleSave,
+            icon: isLoading.value
+                ? SizedBox(
+                    width: 20.w,
+                    height: 20.w,
+                    child: const CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : const Icon(Icons.save, color: Colors.white),
+            label: Text(
+              'Save',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16.sp,
+              ),
+            ),
           ),
+          SizedBox(width: 16.w),
         ],
       ),
-      body: SingleChildScrollView(
-        // Use SingleChildScrollView for scrollable content
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      body: Form(
+        key: formKey,
+        child: ListView(
+          padding: EdgeInsets.all(16.w),
           children: [
-            // Name Field
-            const Text("Name",
-                style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black)),
-            const SizedBox(height: 8),
-            TextField(
-              decoration: InputDecoration(
-                labelText: "Enter Name",
-                labelStyle: const TextStyle(color: Colors.red),
-                filled: true,
-                fillColor: Colors.white,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: Colors.red),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Description Field
-            const Text("Description",
-                style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black)),
-            const SizedBox(height: 8),
-            TextField(
-              decoration: InputDecoration(
-                labelText: "Enter Description",
-                labelStyle: const TextStyle(color: Colors.red),
-                filled: true,
-                fillColor: Colors.white,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: Colors.red),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Applicable On Section
-            const Text("Applicable On",
-                style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black)),
-            Column(
-              children: List.generate(
-                applicableOnItems.length,
-                (index) => CheckboxListTile(
-                  title: Text(
-                    applicableOnItems[index]["text"],
-                    style: const TextStyle(fontSize: 16, color: Colors.black),
+            _buildSection(
+              title: 'Basic Information',
+              icon: Icons.info_outline,
+              children: [
+                TextFormField(
+                  controller: nameController,
+                  decoration: InputDecoration(
+                    labelText: 'Role Name',
+                    hintText: 'Enter role name',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
-                  value: applicableOnItems[index]["value"],
-                  onChanged: (value) {
-                    setState(() {
-                      for (var element in applicableOnItems) {
-                        element["value"] = false;
-                      }
-                      applicableOnItems[index]["value"] = value;
-                      selected =
-                          "${applicableOnItems[index]["id"]},${applicableOnItems[index]["text"]},${applicableOnItems[index]["value"]}";
-                    });
+                  validator: (value) {
+                    if (value?.isEmpty ?? true) {
+                      return 'Role name is required';
+                    }
+                    return null;
                   },
                 ),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Restricted Access Section
-            const Text("Restricted Access",
-                style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black)),
-            Column(
-              children: List.generate(
-                restrictionItems.length,
-                (index) => CheckboxListTile(
-                  title: Text(
-                    restrictionItems[index]["text"],
-                    style: const TextStyle(fontSize: 16, color: Colors.black),
+                SizedBox(height: 16.h),
+                TextFormField(
+                  controller: descriptionController,
+                  decoration: InputDecoration(
+                    labelText: 'Description',
+                    hintText: 'Enter role description',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
-                  value: restrictionItems[index]["value"],
-                  onChanged: (value) {
-                    setState(() {
-                      restrictionItems[index]["value"] = value;
-                    });
-                  },
+                  maxLines: 3,
+                ),
+              ],
+            ),
+            SizedBox(height: 24.h),
+            _buildSection(
+              title: 'Role Type',
+              icon: Icons.people_outline,
+              children: [
+                Card(
+                  elevation: 0,
+                  color: Theme.of(context).primaryColor.withOpacity(0.1),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    children: ['Administrator', 'Manager', 'User', 'Guest']
+                        .map((type) => RadioListTile(
+                              value: type,
+                              groupValue: selectedRole.value,
+                              onChanged: (value) {
+                                selectedRole.value = value.toString();
+                              },
+                              title: Text(type),
+                              subtitle: Text(_getRoleDescription(type)),
+                              activeColor: Theme.of(context).primaryColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ))
+                        .toList(),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 24.h),
+            _buildSection(
+              title: 'Access Permissions',
+              icon: Icons.security_outlined,
+              children: [
+                Card(
+                  elevation: 0,
+                  color: Theme.of(context).primaryColor.withOpacity(0.1),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    children: permissions.value.entries.map((entry) {
+                      return SwitchListTile(
+                        value: entry.value,
+                        onChanged: (value) {
+                          final newPermissions =
+                              Map<String, bool>.from(permissions.value);
+                          newPermissions[entry.key] = value;
+                          permissions.value = newPermissions;
+                        },
+                        title: Text(entry.key),
+                        subtitle: Text(_getPermissionDescription(entry.key)),
+                        activeColor: Theme.of(context).primaryColor,
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 24.h),
+            _buildSection(
+              title: 'Additional Settings',
+              icon: Icons.settings_outlined,
+              children: [
+                Card(
+                  elevation: 0,
+                  color: Theme.of(context).primaryColor.withOpacity(0.1),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    children: additionalSettings.value.entries.map((entry) {
+                      return SwitchListTile(
+                        value: entry.value,
+                        onChanged: (value) {
+                          final newSettings =
+                              Map<String, bool>.from(additionalSettings.value);
+                          newSettings[entry.key] = value;
+                          additionalSettings.value = newSettings;
+                        },
+                        title: Text(entry.key),
+                        subtitle: Text(_getSettingDescription(entry.key)),
+                        activeColor: Theme.of(context).primaryColor,
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 32.h),
+            ElevatedButton(
+              onPressed: isLoading.value ? null : handleSave,
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.symmetric(vertical: 16.h),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
-            ),
-            const SizedBox(height: 16),
-
-            // Permissions Table
-            const Text("Permissions Table",
-                style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black)),
-            const SizedBox(height: 8),
-            DataTable(
-              columns: const [
-                DataColumn(
-                    label: Text("Assign Permissions",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, color: Colors.red))),
-                DataColumn(
-                    label: Text("View",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, color: Colors.red))),
-                DataColumn(
-                    label: Text("Share",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, color: Colors.red))),
-              ],
-              rows: [
-                DataRow(cells: [
-                  const DataCell(Text("Admins")),
-                  DataCell(
-                    Checkbox(
-                        value: isChecked,
-                        onChanged: (value) {
-                          setState(() {
-                            isChecked = value!;
-                          });
-                        }),
-                  ),
-                  DataCell(
-                    Checkbox(
-                        value: isChecked1,
-                        onChanged: (value) {
-                          setState(() {
-                            isChecked1 = value!;
-                          });
-                        }),
-                  ),
-                ]),
-                DataRow(cells: [
-                  const DataCell(Text("Users")),
-                  DataCell(
-                    Checkbox(
-                        value: isChecked2,
-                        onChanged: (value) {
-                          setState(() {
-                            isChecked2 = value!;
-                          });
-                        }),
-                  ),
-                  DataCell(
-                    Checkbox(
-                        value: isChecked3,
-                        onChanged: (value) {
-                          setState(() {
-                            isChecked3 = value!;
-                          });
-                        }),
-                  ),
-                ]),
-                DataRow(cells: [
-                  const DataCell(Text("Guests")),
-                  DataCell(
-                    Checkbox(
-                        value: isChecked4,
-                        onChanged: (value) {
-                          setState(() {
-                            isChecked4 = value!;
-                          });
-                        }),
-                  ),
-                  DataCell(
-                    Checkbox(
-                        value: isChecked5,
-                        onChanged: (value) {
-                          setState(() {
-                            isChecked5 = value!;
-                          });
-                        }),
-                  ),
-                ]),
-              ],
+              child: isLoading.value
+                  ? const CircularProgressIndicator(color: Colors.white)
+                  : const Text('Save Changes'),
             ),
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildSection({
+    required String title,
+    required IconData icon,
+    required List<Widget> children,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(icon, size: 24.sp),
+            SizedBox(width: 8.w),
+            Text(
+              title,
+              style: GoogleFonts.poppins(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 16.h),
+        ...children,
+      ],
+    );
+  }
+
+  String _getRoleDescription(String type) {
+    switch (type) {
+      case 'Administrator':
+        return 'Full access to all features and settings';
+      case 'Manager':
+        return 'Can manage users and content';
+      case 'User':
+        return 'Basic access to features';
+      case 'Guest':
+        return 'Limited access to public features';
+      default:
+        return '';
+    }
+  }
+
+  String _getPermissionDescription(String permission) {
+    switch (permission) {
+      case 'View Content':
+        return 'Access to view all content in the system';
+      case 'Edit Content':
+        return 'Ability to modify existing content';
+      case 'Delete Content':
+        return 'Permission to remove content from the system';
+      case 'Manage Users':
+        return 'Add, edit, and remove user accounts';
+      case 'Access Settings':
+        return 'Configure system-wide settings';
+      default:
+        return '';
+    }
+  }
+
+  String _getSettingDescription(String setting) {
+    switch (setting) {
+      case 'Two-Factor Authentication':
+        return 'Require two-factor authentication for this role';
+      case 'API Access':
+        return 'Allow access to system APIs';
+      case 'Email Notifications':
+        return 'Receive email notifications for important events';
+      case 'Audit Logging':
+        return 'Track all actions performed by users with this role';
+      default:
+        return '';
+    }
   }
 }
