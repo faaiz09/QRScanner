@@ -695,7 +695,7 @@ class _ProfileHeader extends StatelessWidget {
         ),
         SizedBox(height: 4.h),
         Text(
-          'john.doe@example.com',
+          'faaizakhtar@gmail.com',
           style: TextStyle(
             fontSize: 16.sp,
             color: Colors.grey,
