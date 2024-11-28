@@ -1,55 +1,67 @@
 import React, { StrictMode } from "react";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Login from "./LoginPage";
 import LandingPage from "./LandingPage";
 import ResourcesPage from "./ResourcesPage";
-import Navbar from "./Navbar"; // Import Navbar here
+import Navbar from "./Navbar";
 import DashboardPage from "./DashboardPage";
 import AccessPermissionPage from "./AccessPermissionPage";
+import SharedContentViewer from "./components/SharedContentViewer";
+import ErrorBoundary from "./ErrorBoundary";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Login />, // No navbar on Login
+    element: <Login />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: "/landing",
     element: (
       <>
-        <Navbar /> {/* Navbar will appear here */}
+        <Navbar />
         <LandingPage />
       </>
     ),
+    errorElement: <ErrorBoundary />,
   },
   {
     path: "/dashboard",
     element: (
       <>
-        <Navbar /> {/* Navbar will appear here */}
+        <Navbar />
         <DashboardPage />
       </>
     ),
+    errorElement: <ErrorBoundary />,
   },
   {
     path: "/accesspermission",
     element: (
       <>
-        <Navbar /> {/* Navbar will appear here */}
+        <Navbar />
         <AccessPermissionPage />
       </>
     ),
+    errorElement: <ErrorBoundary />,
   },
   {
     path: "/resources",
     element: (
       <>
-        <Navbar /> {/* Navbar will appear here */}
+        <Navbar />
         <ResourcesPage />
       </>
     ),
+    errorElement: <ErrorBoundary />,
+  },
+  {
+    path: "/shared/:token",
+    element: <SharedContentViewer />,
+    errorElement: <ErrorBoundary />,
   },
 ]);
 

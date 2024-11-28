@@ -1,19 +1,18 @@
 import React, { useState } from "react";
 import { NavLink, useLocation, useNavigate, Link } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faBell,
-  faSearch,
-  faChevronDown,
-  faSignOutAlt,
-  faCog,
-  faQuestionCircle,
-  faBars,
-  faTimes,
-  faUserAlt,
-} from "@fortawesome/free-solid-svg-icons";
+  Search,
+  Bell,
+  ChevronDown,
+  LogOut,
+  Settings,
+  HelpCircle,
+  Menu,
+  X,
+  User,
+} from "lucide-react";
 
-import logo from "./assets/technocrafts.png";
+import logo from '../src/assets/Companylogo.png'
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -26,9 +25,7 @@ const Navbar = () => {
     e.preventDefault();
     const willSignout = window.confirm("Are you sure you want to sign out?");
     if (willSignout) {
-      // Your signout logic (like clearing user session, etc.)
-      // Then redirect to login page
-      navigate("/"); // Redirect to login page
+      navigate("/");
     }
   };
 
@@ -39,15 +36,17 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="fixed top-0 w-full z-50 bg-white shadow-md">
+    <nav className="fixed top-0 w-full z-50 bg-gray-900/95 backdrop-blur-sm border-b border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex-shrink-0 flex items-center">
             <Link to="/landing">
-              {" "}
-              {/* Wrap img inside a Link with the path to /landing */}
-              <img src={logo} alt="Company Logo" className="h-8 w-auto" />
+              <img
+                src={logo}
+                alt="Company Logo"
+                className="h-8 w-auto"
+              />
             </Link>
           </div>
 
@@ -57,12 +56,13 @@ const Navbar = () => {
               <NavLink
                 key={link.title}
                 to={link.href}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200
-                  ${
-                    location.pathname === link.href
-                      ? "text-blue-600"
-                      : "text-gray-600 hover:text-blue-600 hover:bg-gray-50"
-                  }`}
+                className={({ isActive }) =>
+                  `px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    isActive
+                      ? "text-red-500 bg-red-500/10"
+                      : "text-gray-400 hover:text-white hover:bg-gray-800"
+                  }`
+                }
               >
                 {link.title}
               </NavLink>
@@ -70,82 +70,47 @@ const Navbar = () => {
           </div>
 
           {/* Right Side Icons */}
-          <div className="hidden lg:flex items-center space-x-4">
-            {/* Search Dialog */}
-            {isSearchOpen && (
-              <div className="dialog">
-                <div className="dialog-content">
-                  <input
-                    type="text"
-                    placeholder="Search..."
-                    className="focus:ring-0 p-2"
-                  />
-                </div>
-              </div>
-            )}
+          <div className="hidden lg:flex items-center space-x-2">
+            {/* Search */}
             <button
-              className="hover:bg-gray-100 p-2"
+              className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
               onClick={() => setIsSearchOpen(!isSearchOpen)}
-              aria-label="Open search"
             >
-              <FontAwesomeIcon
-                icon={faSearch}
-                className="h-5 w-5 text-gray-600"
-              />
+              <Search className="h-5 w-5" />
             </button>
 
-            {/* Notifications Button */}
-            <button
-              className="hover:bg-gray-100 p-2"
-              aria-label="Open notifications"
-            >
-              <FontAwesomeIcon
-                icon={faBell}
-                className="h-5 w-5 text-gray-600"
-              />
+            {/* Notifications */}
+            <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+              <Bell className="h-5 w-5" />
             </button>
 
             {/* User Menu */}
             <div className="relative">
               <button
-                className="hover:bg-gray-100 p-2"
-                aria-label="Open user menu"
+                className="flex items-center space-x-1 p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               >
-                <FontAwesomeIcon
-                  icon={faUserAlt}
-                  className="h-5 w-5 text-gray-600"
-                />
-                <FontAwesomeIcon
-                  icon={faChevronDown}
-                  className="ml-2 h-4 w-4 text-gray-600"
-                />
+                <User className="h-5 w-5" />
+                <ChevronDown className="h-4 w-4" />
               </button>
 
-              {/* Conditionally render the dropdown menu */}
               {isDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md">
+                <div className="absolute right-0 mt-2 w-48 bg-gray-900 border border-gray-800 rounded-xl shadow-xl">
                   <ul className="py-1">
-                    <li className="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer">
-                      <FontAwesomeIcon icon={faCog} className="mr-2 h-4 w-4" />
-                      Settings
+                    <li className="px-4 py-2 text-gray-400 hover:bg-gray-800 hover:text-white cursor-pointer flex items-center space-x-2 transition-colors">
+                      <Settings className="h-4 w-4" />
+                      <span>Settings</span>
                     </li>
-                    <li className="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer">
-                      <FontAwesomeIcon
-                        icon={faQuestionCircle}
-                        className="mr-2 h-4 w-4"
-                      />
-                      Help & Support
+                    <li className="px-4 py-2 text-gray-400 hover:bg-gray-800 hover:text-white cursor-pointer flex items-center space-x-2 transition-colors">
+                      <HelpCircle className="h-4 w-4" />
+                      <span>Help & Support</span>
                     </li>
                     <li
-                      className="px-4 py-2 text-red-600 hover:bg-red-50 cursor-pointer"
+                      className="px-4 py-2 text-red-500 hover:bg-red-500/10 cursor-pointer flex items-center space-x-2 transition-colors"
                       onClick={handleSignout}
                     >
-                      <FontAwesomeIcon
-                        icon={faSignOutAlt}
-                        className="mr-2 h-4 w-4"
-                      />
-                      Sign out
+                      <LogOut className="h-4 w-4" />
+                      <span>Sign out</span>
                     </li>
                   </ul>
                 </div>
@@ -156,20 +121,13 @@ const Navbar = () => {
           {/* Mobile Menu Button */}
           <div className="lg:hidden">
             <button
-              className="hover:bg-gray-100 p-2"
+              className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              aria-label="Toggle mobile menu"
             >
               {isMobileMenuOpen ? (
-                <FontAwesomeIcon
-                  icon={faTimes}
-                  className="h-6 w-6 text-gray-600"
-                />
+                <X className="h-6 w-6" />
               ) : (
-                <FontAwesomeIcon
-                  icon={faBars}
-                  className="h-6 w-6 text-gray-600"
-                />
+                <Menu className="h-6 w-6" />
               )}
             </button>
           </div>
@@ -178,66 +136,72 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 bg-white border-t">
+        <div className="lg:hidden bg-gray-900 border-t border-gray-800">
+          <div className="px-2 pt-2 pb-3 space-y-1">
             {mainNavLinks.map((link) => (
               <NavLink
                 key={link.title}
                 to={link.href}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className={`block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200
-                  ${
-                    location.pathname === link.href
-                      ? "text-blue-600 bg-blue-50"
-                      : "text-gray-600 hover:text-blue-600 hover:bg-gray-50"
-                  }`}
+                className={({ isActive }) =>
+                  `block px-3 py-2 rounded-lg text-base font-medium transition-colors ${
+                    isActive
+                      ? "text-red-500 bg-red-500/10"
+                      : "text-gray-400 hover:text-white hover:bg-gray-800"
+                  }`
+                }
               >
                 {link.title}
               </NavLink>
             ))}
-            <div className="pt-4 pb-3 border-t border-gray-200">
+
+            <div className="pt-4 pb-3 border-t border-gray-800">
               <div className="flex items-center px-3">
                 <div className="flex-shrink-0">
-                  <img
-                    src="/api/placeholder/40/40"
-                    alt="User"
-                    className="h-10 w-10 rounded-full"
-                  />
+                  <div className="h-10 w-10 rounded-lg bg-gray-800 flex items-center justify-center">
+                    <User className="h-6 w-6 text-gray-400" />
+                  </div>
                 </div>
                 <div className="ml-3">
-                  <div className="text-base font-medium text-gray-800">
+                  <div className="text-base font-medium text-gray-200">
                     User Name
                   </div>
-                  <div className="text-sm font-medium text-gray-500">
+                  <div className="text-sm font-medium text-gray-400">
                     user@example.com
                   </div>
                 </div>
               </div>
+
               <div className="mt-3 space-y-1">
-                <button className="w-full justify-start text-gray-600 hover:text-blue-600 hover:bg-gray-50">
-                  <FontAwesomeIcon icon={faCog} className="mr-3 h-5 w-5" />
+                <button className="w-full px-4 py-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors flex items-center">
+                  <Settings className="h-5 w-5 mr-3" />
                   Settings
                 </button>
-                <button className="w-full justify-start text-gray-600 hover:text-blue-600 hover:bg-gray-50">
-                  <FontAwesomeIcon
-                    icon={faQuestionCircle}
-                    className="mr-3 h-5 w-5"
-                  />
+                <button className="w-full px-4 py-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors flex items-center">
+                  <HelpCircle className="h-5 w-5 mr-3" />
                   Help & Support
                 </button>
                 <button
                   onClick={handleSignout}
-                  className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+                  className="w-full px-4 py-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors flex items-center"
                 >
-                  <FontAwesomeIcon
-                    icon={faSignOutAlt}
-                    className="mr-3 h-5 w-5"
-                  />
+                  <LogOut className="h-5 w-5 mr-3" />
                   Sign out
                 </button>
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Search Dialog */}
+      {isSearchOpen && (
+        <div className="absolute top-16 left-0 w-full p-4 bg-gray-900 border-t border-gray-800">
+          <input
+            type="text"
+            placeholder="Search..."
+            className="w-full bg-gray-800 text-gray-200 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:border-red-500 transition-colors"
+          />
         </div>
       )}
     </nav>

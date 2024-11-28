@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import logo from '../src/assets/Companylogo.png'
+import logo from "../src/assets/Companylogo.png";
+import background from "../src/assets/background.jpg"; // Import your background image
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -93,20 +94,22 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 p-4">
+    <div
+      className="min-h-screen flex items-center justify-center bg-cover bg-center bg-no-repeat p-4"
+      style={{
+        backgroundImage: `url(${background})`,
+      }}
+    >
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-lg shadow-xl p-8 transition-all duration-300 hover:shadow-2xl">
+        <div className="bg-white bg-opacity-70 backdrop-blur-md rounded-lg shadow-xl p-8 transition-all duration-300 hover:shadow-2xl">
           {/* Header */}
-          {/* Replace the text header with this */}
           <div className="text-center mb-8">
             <img
               src={logo}
               alt="Company Logo"
               className="mx-auto h-auto w-auto object-contain mb-4"
             />
-            <p className="text-gray-600">
-              Enter your credentials to login
-            </p>
+            <p className="text-gray-600">Enter your credentials to login</p>
           </div>
 
           {/* Form */}
